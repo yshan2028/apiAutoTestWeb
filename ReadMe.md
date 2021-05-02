@@ -15,9 +15,9 @@
 - [x] 扩展脚本
 
 # 文档资料
-[apiAutoTestWeb说明文档](backend\apiAutoTestWeb使用说明.md)
-[后端说明文档](backend\readme.md)
-[前端说明文档](frontend\README.md)
+[apiAutoTestWeb说明文档](backend/apiAutoTestWeb使用说明.md)
+[后端说明文档](backend/readme.md)
+[前端说明文档](frontend/README.md)
 
 
 # 部署
