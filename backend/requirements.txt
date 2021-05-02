@@ -1,0 +1,9 @@
+tortoise-orm
+fastapi
+uvicorn
+python-jose
+passlib[bcrypt]
+aiofiles
+aiohttp
+jsonpath
+apscheduler
