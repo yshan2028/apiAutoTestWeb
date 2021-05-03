@@ -241,8 +241,9 @@ export default {
   data() {
     return {
       pt: {
-        // name: '营收',
         type: "pie", //饼状视图
+        radius: "55%",
+        // center: ['50%', '60%'],
         data: [],
         label: {
           //   position:'inside' ,//如果需要文字显示在图形里面则设置

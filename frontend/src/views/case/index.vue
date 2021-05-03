@@ -254,7 +254,7 @@ export default {
         create: "创建",
       },
       rules: {
-        name: [{ required: true, message: "请填写环境名称", trigger: "blur" }],
+        name: [{ required: true, message: "请填写用例名称", trigger: "blur" }],
         interface_id: [
           { required: true, message: "请选择接口", trigger: "blur" },
         ],
