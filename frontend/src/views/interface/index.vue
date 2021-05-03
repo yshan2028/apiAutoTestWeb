@@ -187,8 +187,15 @@
     </el-dialog>
 
     <!-- 弹出框导入接口 -->
-    <el-dialog title="导入接口" :visible.sync="exportVisible" width="30%">
-      <el-form ref="form" :model="exportForm" label-width="80px" :rules="exportRules">
+    <el-dialog title="导入接口" :visible.sync="exportVisible">
+      <el-form
+        ref="importForm"
+        :model="exportForm"
+        label-width="80px"
+        :rules="exportRules"
+        style="width: 400px"
+        
+      >
         <el-form-item label="项目" prop="project_id">
           <el-select
             filterable
@@ -208,39 +215,33 @@
           </el-select>
         </el-form-item>
         <el-form-item label="规范">
-          <el-radio-group
-            v-model="exportForm.standard"
-            @change="radioChange"
-          >
+          <el-radio-group v-model="exportForm.standard" @change="radioChange">
             <el-radio label="restful" />
             <el-radio label="graphql" disabled />
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="文件" >
-          <el-switch
-            v-model="fileUpload"
-            @change="taskTypeChange"
-            disabled
-          >
+        <el-form-item label="文件">
+          <el-switch v-model="fileUpload" @change="taskTypeChange" disabled>
           </el-switch>
         </el-form-item>
-        <el-form-item
-          v-if="fileUpload"
-          label="文件"
-          prop="file"
-        >
+        <el-form-item v-if="fileUpload" label="文件" prop="file">
           <el-upload
-  class="upload-demo"
-  drag
-  action="https://jsonplaceholder.typicode.com/posts/"
-  multiple>
-  <i class="el-icon-upload"></i>
-  <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-  <div class="el-upload__tip" slot="tip">只能上传openapi.json/schema.gql(暂不支持)文件</div>
-</el-upload>
+            class="upload-demo"
+            drag
+            action="https://jsonplaceholder.typicode.com/posts/"
+            multiple
+          >
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">
+              将文件拖到此处，或<em>点击上传</em>
+            </div>
+            <div class="el-upload__tip" slot="tip">
+              只能上传openapi.json/schema.gql(暂不支持)文件
+            </div>
+          </el-upload>
         </el-form-item>
         <el-form-item label="地址" prop="url" v-show="!fileUpload">
-          <el-input v-model="exportForm.url"></el-input>
+          <el-input v-model="exportForm.url" placeholder="http://49.232.203.244:8000/openapi.json"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -277,11 +278,20 @@ export default {
         standard: "restful",
         url: "",
         // 上传文件
-        file: null,
+        file: null
       },
-      exportRules:{
-        project_id: [{ required: true, message: "请选择项目", trigger: "blur" }],
-        url: [{required: true, message: "请填写接口文档URL", trigger: "blur", type:"url"}]
+      exportRules: {
+        project_id: [
+          { required: true, message: "请选择项目", trigger: "blur" }
+        ],
+        url: [
+          {
+            required: true,
+            message: "请填写swagger openapi.json 的url地址",
+            trigger: "blur",
+            type: "url"
+          }
+        ]
       },
       projects: [],
       tableKey: 0,
@@ -416,31 +426,44 @@ export default {
         this.temp.method = "get";
       }
     },
+
+    resetImport() {
+      this.exportForm = {
+        project_id: null,
+        standard: "restful",
+        url: "",
+        // 上传文件
+        file: null
+      };
+    },
     // 点击导入
     handleExport() {
+      this.resetImport();
       this.exportVisible = true;
+      this.$nextTick(() => {
+        this.$refs["importForm"].clearValidate();
+      });
     },
 
     // 选择接口文档导入接口
     importInterfaceData() {
-      // 提交接口
-      importInterfaces(this.exportForm).then(res => {
-        console.log(res)
-                this.$notify({
-          title: "Success",
-          message: res.message,
-          type: "success",
-          duration: 2000
-        });
-        this.getList();
-      }
-      )
-      this.exportVisible = false;
+      this.$refs["importForm"].validate(valid => {
+        if (valid) {
+          importInterfaces(this.exportForm).then(res => {
+            this.exportVisible = false;
+            this.$notify({
+              title: "Success",
+              message: res.message,
+              type: "success",
+              duration: 2000
+            });
+            this.getList()
+          });
+        }
+      });
     },
 
-    taskTypeChange(){
-      
-    }
+    taskTypeChange() {}
   }
 };
 </script>

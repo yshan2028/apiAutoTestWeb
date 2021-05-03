@@ -87,7 +87,16 @@
   > 目前个人公司项目接触到，发现只能是post请求，json数据格式传输
 
   ![](https://gitee.com/zy7y/blog_images/raw/master/img/image-20210502104458705.png)
+  
+- 接口导入(2020-05-03新增)
 
+  > 该版本仅支持通过Swagger接口文档(openapi.json)`url`方式导入，暂不支持用例生成.
+
+  ![](https://gitee.com/zy7y/blog_images/raw/master/img/20210503221628.png)
+
+  - `openapi.json`地址获取
+
+    ![](https://gitee.com/zy7y/blog_images/raw/master/img/20210503222116.png)
 ## 7. 用例管理
 
 - RESTful规范
