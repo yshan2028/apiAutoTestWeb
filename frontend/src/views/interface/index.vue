@@ -10,6 +10,15 @@
       >
         新增
       </el-button>
+      <el-button
+        class="filter-item"
+        style="margin-left: 10px"
+        type="primary"
+        icon="el-icon-upload"
+        @click="handleExport"
+      >
+        接口导入
+      </el-button>
     </div>
 
     <el-table
@@ -176,6 +185,69 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <!-- 弹出框导入接口 -->
+    <el-dialog title="导入接口" :visible.sync="exportVisible" width="30%">
+      <el-form ref="form" :model="exportForm" label-width="80px" :rules="exportRules">
+        <el-form-item label="项目" prop="project_id">
+          <el-select
+            filterable
+            class="filter-item"
+            v-model="exportForm.project_id"
+            placeholder="请选择项目"
+            @change="$forceUpdate()"
+          >
+            <!--  $forceUpdate() 强制刷新-->
+            <el-option
+              v-for="project in projects"
+              :key="project.id"
+              :label="project.name"
+              :value="project.id"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="规范">
+          <el-radio-group
+            v-model="exportForm.standard"
+            @change="radioChange"
+          >
+            <el-radio label="restful" />
+            <el-radio label="graphql" disabled />
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="文件" >
+          <el-switch
+            v-model="fileUpload"
+            @change="taskTypeChange"
+            disabled
+          >
+          </el-switch>
+        </el-form-item>
+        <el-form-item
+          v-if="fileUpload"
+          label="文件"
+          prop="file"
+        >
+          <el-upload
+  class="upload-demo"
+  drag
+  action="https://jsonplaceholder.typicode.com/posts/"
+  multiple>
+  <i class="el-icon-upload"></i>
+  <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+  <div class="el-upload__tip" slot="tip">只能上传openapi.json/schema.gql(暂不支持)文件</div>
+</el-upload>
+        </el-form-item>
+        <el-form-item label="地址" prop="url" v-show="!fileUpload">
+          <el-input v-model="exportForm.url"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="exportVisible = false">取 消</el-button>
+        <el-button type="primary" @click="importInterfaceData">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -186,6 +258,7 @@ import {
   deleteInterface,
   createInterface,
   updateInterface,
+  importInterfaces
 } from "@/api/interface";
 import waves from "@/directive/waves"; // waves directive
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
@@ -196,6 +269,20 @@ export default {
   directives: { waves },
   data() {
     return {
+      // 导入按钮弹出表单控制
+      exportVisible: false,
+      fileUpload: false,
+      exportForm: {
+        project_id: null,
+        standard: "restful",
+        url: "",
+        // 上传文件
+        file: null,
+      },
+      exportRules:{
+        project_id: [{ required: true, message: "请选择项目", trigger: "blur" }],
+        url: [{required: true, message: "请填写接口文档URL", trigger: "blur", type:"url"}]
+      },
       projects: [],
       tableKey: 0,
       list: null,
@@ -204,7 +291,7 @@ export default {
       // 默认查询所有接口参数
       listQuery: {
         page: 1,
-        limit: 20,
+        limit: 20
       },
       // 弹出框表单
       temp: {
@@ -212,30 +299,29 @@ export default {
         name: "",
         base_url: "",
         desc: "",
-        standard: "restful",
+        standard: "restful"
       },
       dialogFormVisible: false,
       dialogStatus: "",
       textMap: {
         update: "编辑",
-        create: "创建",
+        create: "创建"
       },
       rules: {
         name: [{ required: true, message: "请填写接口名称", trigger: "blur" }],
-        project_id: [
-          { required: true, message: "请选择项目", trigger: "blur" },
-        ],
+        project_id: [{ required: true, message: "请选择项目", trigger: "blur" }]
       },
-      downloadLoading: false,
+      downloadLoading: false
     };
   },
   created() {
     this.getList();
+    this.getProjects();
   },
   methods: {
     getList() {
       this.listLoading = true;
-      fetchList(this.listQuery).then((response) => {
+      fetchList(this.listQuery).then(response => {
         this.list = response.data.items;
         this.total = response.data.total;
 
@@ -245,6 +331,11 @@ export default {
         }, 1.5 * 1000);
       });
     },
+    getProjects() {
+      projectList().then(res => {
+        this.projects = res.data.items;
+      });
+    },
     resetTemp() {
       this.temp = {
         project_id: "",
@@ -252,31 +343,28 @@ export default {
         path: "",
         desc: "",
         method: "get",
-        standard: "restful",
+        standard: "restful"
       };
     },
     // 点击新增按钮需要调用project列表接口
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
-      projectList().then((res) => {
-        this.projects = res.data.items;
-      });
       this.dialogFormVisible = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].clearValidate();
       });
     },
     createData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          createInterface(this.temp).then((res) => {
+          createInterface(this.temp).then(res => {
             this.dialogFormVisible = false;
             this.$notify({
               title: "Success",
               message: "创建成功",
               type: "success",
-              duration: 2000,
+              duration: 2000
             });
             this.getList();
           });
@@ -284,7 +372,6 @@ export default {
       });
     },
     handleUpdate(row) {
-      projectList().then((res) => (this.projects = res.data.items));
       this.temp = Object.assign({}, row); // copy obj
       this.temp.project_id = this.temp.project.id;
       this.dialogStatus = "update";
@@ -294,15 +381,15 @@ export default {
       });
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          updateInterface(this.temp).then((res) => {
+          updateInterface(this.temp).then(res => {
             this.dialogFormVisible = false;
             this.$notify({
               title: "Success",
               message: "更新成功",
               type: "success",
-              duration: 2000,
+              duration: 2000
             });
             this.getList();
           });
@@ -310,12 +397,12 @@ export default {
       });
     },
     DeleteData(row) {
-      deleteInterface(row.id).then((res) => {
+      deleteInterface(row.id).then(res => {
         this.$notify({
           title: "Success",
           message: "删除成功",
           type: "success",
-          duration: 2000,
+          duration: 2000
         });
         this.getList();
       });
@@ -329,7 +416,32 @@ export default {
         this.temp.method = "get";
       }
     },
-  },
+    // 点击导入
+    handleExport() {
+      this.exportVisible = true;
+    },
+
+    // 选择接口文档导入接口
+    importInterfaceData() {
+      // 提交接口
+      importInterfaces(this.exportForm).then(res => {
+        console.log(res)
+                this.$notify({
+          title: "Success",
+          message: res.message,
+          type: "success",
+          duration: 2000
+        });
+        this.getList();
+      }
+      )
+      this.exportVisible = false;
+    },
+
+    taskTypeChange(){
+      
+    }
+  }
 };
 </script>
 

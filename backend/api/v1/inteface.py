@@ -11,6 +11,7 @@ from fastapi import APIRouter
 
 import core
 from db import models
+from util.import_interface import ImportInterface
 
 interfaces = APIRouter(tags=["接口相关"])
 
@@ -50,3 +51,12 @@ async def select(r_id: int):
 async def update(r_id: int, interface: models.InterfaceIn_Pydantic):
     await models.Interface.filter(id=r_id).update(**interface.dict(exclude_unset=True))
     return core.Success(data=await models.Interface_Pydantic.from_queryset_single(models.Interface.get(id=r_id)))
+
+
+@interfaces.post("/interface/export", summary="接口导入,暂不支持用例生成")
+async def export_interface(swagger: core.ExportInterface):
+    """需要传入swagger 文档中的 openapi.json 地址 ：如 ~ http://49.232.203.244:8000/openapi.json """
+    if swagger.url != "" and swagger.file is None:
+        message = await ImportInterface.swagger(project_id=swagger.project_id, url=swagger.url)
+        return core.Success(message=message) if '成功' in message else core.Fail(message=message)
+    return core.Fail(message="导入失败,功能待开发.")

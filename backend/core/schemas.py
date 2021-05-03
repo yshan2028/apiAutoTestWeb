@@ -43,3 +43,10 @@ class Code(BaseModel):
 class TimerJob(BaseModel):
     job_id: str
     cron: str = Body(default='*/2 * * * *', max_length=30)  # 每2秒执行一次.
+
+
+class ExportInterface(BaseModel):
+    project_id: int
+    url: str
+    standard: str = "restful"
+    file: Any = None

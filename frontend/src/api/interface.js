@@ -60,3 +60,17 @@ export function projectList() {
     method: "get"
   });
 }
+
+// 导入接口
+export function importInterfaces(data) {
+  return request({
+    url: "/interface/export",
+    method: "post",
+    data: {
+      project_id: data.project_id,
+      standard: data.standard,
+      url: data.url,
+      file: data.file
+    }
+  });
+}
