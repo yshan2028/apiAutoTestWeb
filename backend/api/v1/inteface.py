@@ -57,6 +57,8 @@ async def update(r_id: int, interface: models.InterfaceIn_Pydantic):
 async def export_interface(swagger: core.ExportInterface):
     """需要传入swagger 文档中的 openapi.json 地址 ：如 ~ http://49.232.203.244:8000/openapi.json """
     if swagger.url != "" and swagger.file is None:
-        message = await ImportInterface.swagger(project_id=swagger.project_id, url=swagger.url)
-        return core.Success(message=message) if '成功' in message else core.Fail(message=message)
+        message = await ImportInterface.swagger(project_id=swagger.project_id, standard=swagger.standard, url=swagger.url)
+        return core.Success(
+            message=message) if '成功' in message else core.Fail(
+            message=message)
     return core.Fail(message="导入失败,功能待开发.")

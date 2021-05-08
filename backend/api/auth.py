@@ -5,6 +5,8 @@ author: zy7y
 date: 2021/4/17
 desc: 鉴权处理
 """
+from typing import List, Union
+
 from fastapi import APIRouter, Depends
 
 import core
@@ -21,8 +23,8 @@ async def login(user: core.Login):
             return core.Success(data=core.Token(
                 token=core.create_access_token({"sub": user_obj.username})))
     except Exception as e:
-        print(e)
-        return core.Fail(message="用户名或密码错误")
+        pass
+    return core.Fail(message="用户名或密码错误")
 
 
 @auth.post("/logout", name="退出")
