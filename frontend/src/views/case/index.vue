@@ -130,22 +130,6 @@
         <el-form-item label="名称" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
-        <!-- <el-form-item label="token读写">
-          <el-switch
-            v-model="temp.token"
-            active-text="写"
-            inactive-text="读"
-            @change="tokenChange"
-          >
-          </el-switch>
-        </el-form-item>
-        <el-form-item
-          v-if="temp.token"
-          label="token提取表达式"
-          prop="token_path"
-        >
-          <el-input placeholder="token提取表达式" v-model="temp.token_path" />
-        </el-form-item> -->
         <el-form-item label="参数类型" prop="keyword" v-if="standard">
           <el-radio-group v-model="temp.content_type">
             <el-radio label="params"></el-radio>
@@ -169,20 +153,20 @@
             placeholder='{参数名:参数值} => {"username":"123456"}'
           />
         </el-form-item>
+            <el-form-item label="提取参数">
+          <el-input
+            v-model="temp.extra"
+            :autosize="{ minRows: 2, maxRows: 4 }"
+            type="textarea"
+            placeholder='{参数名:提取参数表达式} => {"token": "$.token"}'
+          />
+        </el-form-item>
         <el-form-item label="预期结果" prop="expect">
           <el-input
             v-model="temp.expect"
             :autosize="{ minRows: 2, maxRows: 4 }"
             type="textarea"
             placeholder='{实际:预期} => {"$.code":200}'
-          />
-        </el-form-item>
-        <el-form-item label="提取参数">
-          <el-input
-            v-model="temp.extra"
-            :autosize="{ minRows: 2, maxRows: 4 }"
-            type="textarea"
-            placeholder='{参数名:提取参数表达式} => {"token": "$.token"}'
           />
         </el-form-item>
       </el-form>
@@ -243,8 +227,6 @@ export default {
         extra: null,
         expect: null,
         body: null,
-        token: false,
-        token_path: null,
         query: null
       },
       dialogFormVisible: false,
@@ -281,14 +263,7 @@ export default {
   },
   created() {
     this.getList();
-  },
-  computed: {
-    // 处理token操作返回布尔值显示
-    formatToken() {
-      return function (value) {
-        return value ? "写" : "读";
-      };
-    },
+    
   },
   methods: {
     getList() {
@@ -302,6 +277,7 @@ export default {
           this.listLoading = false;
         }, 1.5 * 1000);
       });
+            projectList().then((res) => (this.projects = res.data.items));
     },
     resetTemp() {
       this.temp = {
@@ -311,8 +287,6 @@ export default {
         extra: null,
         content_type: "params",
         expect: null,
-        token: false,
-        token_path: null,
         query: null,
       };
       this.values = [];
@@ -321,9 +295,6 @@ export default {
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
-      projectList().then((res) => {
-        this.projects = res.data.items;
-      });
       this.dialogFormVisible = true;
       this.$nextTick(() => {
         this.$refs["dataForm"].clearValidate();
@@ -347,7 +318,6 @@ export default {
     },
     handleUpdate(row) {
       this.standard = row.interface.standard == "graphql" ? false : true;
-      projectList().then((res) => (this.projects = res.data.items));
       this.temp = Object.assign({}, row); // copy obj
       this.temp.interface_id = this.temp.interface.id;
       this.values = [this.temp.interface.project.id, this.temp.interface.id];

@@ -38,8 +38,6 @@ export function updateCase(data) {
       content_type: data.content_type,
       extra: data.extra,
       expect: data.expect,
-      token: data.token,
-      token_path: data.token_path,
       query: data.query
     }
   });
