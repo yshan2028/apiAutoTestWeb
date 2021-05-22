@@ -106,12 +106,6 @@ class Interface(AbstractModel):
 
 class Case(AbstractModel):
     name = fields.CharField(max_length=255, description="用例名称", unique=True)
-    token = fields.BooleanField(default=False, description="token读写操作，默认为读")
-    token_path = fields.CharField(
-        max_length=255,
-        description="jsonpath提取token表达式",
-        null=True,
-        default=None)
     content_type = fields.CharEnumField(
         ContentType,
         description="参数类型",

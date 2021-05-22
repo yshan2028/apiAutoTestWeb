@@ -17,7 +17,6 @@ from string import Template
 
 from util import report
 from .extend import *
-import traceback
 
 
 class ApiAutoTest:
@@ -35,6 +34,22 @@ class ApiAutoTest:
         loc = locals()
         exec(f"result = {func}")
         return str(loc['result'])
+
+    @classmethod
+    async def extra_jsonpath(cls, obj: object, expr: str = '.'):
+        """
+        根据jsonpath提取obj里面的内容，如果提取出现异常返回传入的expr值
+        Args:
+            obj: 对象，可被jsonpath语法提取的内容，一般都是json/dict
+            expr: jsonpath提取表达式
+
+        Returns:
+
+        """
+        try:
+            return jsonpath(obj, expr)[0]
+        except Exception as e:
+            return expr
 
     @classmethod
     async def request(cls, method: str, url: str, content_type: str, data: dict, header: dict, info: dict) -> dict:
@@ -113,6 +128,14 @@ class ApiAutoTest:
 
     @classmethod
     async def get_operation_name(cls, query: str):
+        """
+        获取Graphql规范接口，Query语句的operationName内容
+        Args:
+            query: 完整的query语句部分
+
+        Returns:
+
+        """
         try:
             # 有参数的query语句
             result = re.findall(' (.*?)\\(', query)[0]
@@ -161,7 +184,7 @@ class ApiAutoTest:
 
         """
         for k, v in extra_json.items():
-            data_pool[k] = jsonpath(resp, v)[0]
+            data_pool[k] = await cls.extra_jsonpath(resp, v)
 
     @classmethod
     async def equal(cls, expect_json: dict, resp: dict, info: dict) -> str:
@@ -177,12 +200,10 @@ class ApiAutoTest:
         info["expect"] = []
         result = "异常"
         for k, v in expect_json.items():
+            exec_result = await cls.extra_jsonpath(resp, k)
             info["expect"].append(
-                {f"{k} ? {v}": f'{jsonpath(resp, k)[0]} == {v}'})
-            if jsonpath(resp, k)[0] == v:
-                result = "正常"
-            else:
-                result = "失败"
+                {f"{k} ? {v}": f'{exec_result} == {v}'})
+            result = "正常" if exec_result == v else "失败"
         info["result"] = result
         return result
 
@@ -227,7 +248,7 @@ class ApiAutoTest:
                     test_suite_data["fail"] += 1
 
             except Exception as e:
-                info["error_code"] = traceback.format_exc()
+                info["error_code"] = str(e)
                 info["result"] = "异常"
                 test_suite_data["expect"] += 1
                 continue

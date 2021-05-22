@@ -87,7 +87,6 @@ async def create(task: models.TaskInCase):
 @tasks.delete("/task/{t_id}", name="删除任务")
 async def delete(t_id: int):
     task_obj = await models.Task.filter(id=t_id).delete()
-    print(task_obj == True)
     if task_obj:
         try:
             scheduler.delete_job(str(t_id))

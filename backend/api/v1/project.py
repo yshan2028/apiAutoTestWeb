@@ -61,7 +61,7 @@ async def update(p_id: int, project: models.ProjectIn_Pydantic):
 
 @projects.get("/project/{p_id}/cases", name="获取项目下所有用例")
 async def get_cases(p_id: int):
-    sql = f'select "case".id, "case".name, "case".interface_id from "case", interface WHERE  interface.id = "case".interface_id AND interface.project_id ={p_id};'
+    sql = f"select 'case'.id, 'case'.name, 'case'.interface_id from 'case', interface WHERE  interface.id = 'case'.interface_id AND interface.project_id ={p_id};"
     async with in_transaction("default") as conn:
         data = await conn.execute_query_dict(sql)
     return core.Success(data={"total": len(data), "items": data})
