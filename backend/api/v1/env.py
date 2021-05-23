@@ -18,6 +18,14 @@ envs = APIRouter(tags=["环境相关"])
 
 @envs.post("/env", name="环境新增")
 async def create(env: models.EnvIn_Pydantic):
+    """
+    环境新增数据库配置目前只提供mysql，需按照如下字典配置
+    Args:
+        env:
+
+    Returns:
+
+    """
     try:
         env_obj = await models.Env.create(**env.dict(exclude_unset=True))
         return core.Success(data=await models.Env_Pydantic.from_tortoise_orm(env_obj))

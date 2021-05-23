@@ -1,5 +1,13 @@
+/*
+ * @Author: zy7y
+ * @Date: 2021-05-22 15:54:24
+ * @LastEditTime: 2021-05-23 22:10:45
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \frontend\src\api\env.js
+ */
 /**
- * 项目相关接口
+ * 环境相关接口
  */
 import request from "@/utils/request";
 
@@ -36,7 +44,8 @@ export function updateEnv(data) {
       base_url: data.base_url,
       project_id: data.project_id,
       base_header: data.base_header,
-      desc: data.desc
+      desc: data.desc,
+      db_setting: data.db_setting
     }
   });
 }

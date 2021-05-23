@@ -47,36 +47,7 @@ class Env(AbstractModel):
     base_header = fields.TextField(
         description="基准请求头", null=True, default='{}')
     # allow_none 生成的pydantic模型可以不传递该参数, default 可以设置数据库表中的默认值，pydantic的默认值
-    db_host = fields.CharField(
-        255,
-        description="数据库地址",
-        null=True,
-        allow_none=True)
-    db_port = fields.CharField(
-        255,
-        description="数据库端口",
-        null=True,
-        allow_none=True)
-    db_name = fields.CharField(
-        255,
-        description="数据库名称",
-        null=True,
-        allow_none=True)
-    db_charset = fields.CharField(
-        255,
-        description="数据库编码",
-        null=True,
-        allow_none=True)
-    db_user = fields.CharField(
-        255,
-        description="数据库用户",
-        null=True,
-        allow_none=True)
-    db_passwd = fields.CharField(
-        255,
-        description="数据库密码",
-        null=True,
-        allow_none=True)
+    db_settings = fields.JSONField(null=True, default=None, description="数据库配置")
     # 外键关联project表，可通过.envs访问到项目所有表
     # https://tortoise-orm.readthedocs.io/en/latest/models.html
     project = fields.ForeignKeyField('models.Project', related_name='envs')
@@ -127,6 +98,8 @@ class Case(AbstractModel):
         null=True,
         allow_none=True,
         default=None)
+    # 后置sql
+    backend_sql = fields.TextField(description="后置sql", default="", null=True, allow_none=True)
     expect = fields.TextField(description="预期结果", default='{}')
     interface = fields.ForeignKeyField(
         'models.Interface',

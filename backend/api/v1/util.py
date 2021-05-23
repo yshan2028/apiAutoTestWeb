@@ -10,6 +10,7 @@
 from tortoise.transactions import in_transaction
 
 import core
+from core import MysqlSettings
 from db import models
 from util import read_file
 
@@ -59,3 +60,8 @@ async def get_plant():
         "task": await models.Task.all().count(),
         "today": today
     })
+
+
+@utils.post("/mysql_connection", summary="mysql连接测试")
+async def test_connection(mysql: MysqlSettings):
+    pass

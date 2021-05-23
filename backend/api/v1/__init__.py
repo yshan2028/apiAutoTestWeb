@@ -21,10 +21,10 @@ from .user import users
 from .project import projects
 from .util import utils
 
-v1 = APIRouter(prefix="/v1", dependencies=[Depends(core.get_current_user)])
+# v1 = APIRouter(prefix="/v1", dependencies=[Depends(core.get_current_user)])
 
 
-# v1 = APIRouter(prefix="/v1")
+v1 = APIRouter(prefix="/v1")
 v1.include_router(users)
 v1.include_router(projects)
 v1.include_router(envs)

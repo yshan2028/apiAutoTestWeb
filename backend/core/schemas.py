@@ -50,3 +50,11 @@ class ExportInterface(BaseModel):
     url: str
     standard: str = "restful"
     file: Any = None
+
+
+class MysqlSettings(BaseModel):
+    host: str
+    port: str
+    user: str
+    password: str
+    database: str

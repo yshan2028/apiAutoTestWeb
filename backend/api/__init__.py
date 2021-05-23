@@ -42,9 +42,9 @@ def create_app():
         db_url="sqlite://db.sqlite3",
         modules={"models": ["db.models"]},
         # # 生成表
-        # generate_schemas=True,  
-        # # 使用异常，当无数据是自动返回
-        # add_exception_handlers=True,
+        generate_schemas=True,
+        # 使用异常，当无数据是自动返回
+        add_exception_handlers=True,
     )
 
     # 跨域中间件

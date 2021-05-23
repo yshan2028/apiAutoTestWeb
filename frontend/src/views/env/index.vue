@@ -137,6 +137,16 @@
             placeholder="Please input"
           />
         </el-form-item>
+        <el-form-item label="数据库配置">
+          <vue-json-editor
+            v-model="mysql_default"
+            :showBtns="true"
+            :mode="'code'"
+            @json-change="onJsonChange"
+            lang="zh" 
+            @json-save="connectTest"
+          />
+        </el-form-item>
         <el-form-item label="描述信息">
           <el-input
             v-model="temp.desc"
@@ -171,6 +181,19 @@ import waves from "@/directive/waves"; // waves directive
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import vueJsonEditor from "vue-json-editor";
 
+
+/**
+ * 
+ * 
+ * {
+  "host": "http://localhost",
+  "port": "123456",
+  "charset":"utf8mb4",
+  "user":"root",
+  "password":"123456",
+  "db_name":"uniapp_shop"
+}
+ */
 export default {
   name: "ComplexTable",
   components: { Pagination, vueJsonEditor },
@@ -182,6 +205,15 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
+
+      mysql_default: {
+  "host": "http://localhost",
+  "port": "3306",
+  "charset":"utf8mb4",
+  "user":"root",
+  "password":"123456",
+  "database":"uniapp_shop"
+},
       // 默认查询所有接口参数
       listQuery: {
         page: 1,
@@ -199,6 +231,7 @@ export default {
         base_url: "",
         desc: "",
         base_header: '{}',
+        db_settings: null
       },
       dialogFormVisible: false,
       dialogStatus: "",
@@ -246,6 +279,7 @@ export default {
         base_url: "",
         base_header: '{}',
         desc: "",
+        db_settings: null
       };
     },
     // 点击新增按钮需要调用project列表接口
@@ -317,6 +351,10 @@ export default {
     onJsonChange(value) {
       this.temp.base_header = value;
     },
+    
+    connectTest(value){
+      console.log(value)
+    }
   },
 };
 </script>

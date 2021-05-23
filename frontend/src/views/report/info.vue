@@ -15,7 +15,7 @@
       <el-table :data="tableData" style="width: 100%" :cell-style="cellStyle">
         <el-table-column type="expand">
           <template slot-scope="props">
-            <el-tabs>
+            <el-tabs v-model="activeName">
               <el-tab-pane label="请求信息" name="request">
                 <div class="vs">
                   <vue-json-editor
@@ -252,7 +252,8 @@ export default {
       },
       infoList: [],
       reportInfo: [],
-      tableData: []
+      tableData: [],
+      activeName: "request"
     };
   }
 };

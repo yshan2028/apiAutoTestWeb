@@ -161,6 +161,14 @@
             placeholder='{参数名:提取参数表达式} => {"token": "$.token"}'
           />
         </el-form-item>
+            <el-form-item label="后置sql">
+          <el-input
+            v-model="temp.backend_sql"
+            :autosize="{ minRows: 2, maxRows: 4 }"
+            type="textarea"
+            placeholder='后置sql,多sql使用 ; 分隔'
+          />
+        </el-form-item>
         <el-form-item label="预期结果" prop="expect">
           <el-input
             v-model="temp.expect"
@@ -227,7 +235,8 @@ export default {
         extra: null,
         expect: null,
         body: null,
-        query: null
+        query: null,
+        backend_sql: null
       },
       dialogFormVisible: false,
       dialogStatus: "",
@@ -239,13 +248,6 @@ export default {
         name: [{ required: true, message: "请填写用例名称", trigger: "blur" }],
         interface_id: [
           { required: true, message: "请选择接口", trigger: "blur" },
-        ],
-        token_path: [
-          {
-            required: true,
-            message: "请填写token提取表达式",
-            trigger: "blur",
-          },
         ],
         query: [{
            required: true,
@@ -288,6 +290,7 @@ export default {
         content_type: "params",
         expect: null,
         query: null,
+        backend_sql: null
       };
       this.values = [];
     },
