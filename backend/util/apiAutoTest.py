@@ -17,6 +17,7 @@ from string import Template
 
 from util import report
 from .extend import *
+from .mysql import Mysql
 
 
 class ApiAutoTest:
@@ -164,12 +165,13 @@ class ApiAutoTest:
         extra = await cls.template_var(case.extra, data_pool)
         expect = await cls.template_var(case.expect, data_pool)
         header = await cls.template_var(base_header, data_pool)
+        backend_sql = await cls.template_var(case.backend_sql, data_pool)
 
         # graphql 规范组装 请求数据
         if case.interface.standard == 'graphql':
             body = {"operationName": await cls.get_operation_name(case.query), "query": case.query, "variables": body}
 
-        return method, content_type, path, body, extra, expect, header
+        return method, content_type, path, body, extra, expect, header, backend_sql
 
     @classmethod
     async def extra_var(cls, extra_json: dict, data_pool: dict, resp: dict):
@@ -185,6 +187,15 @@ class ApiAutoTest:
         """
         for k, v in extra_json.items():
             data_pool[k] = await cls.extra_jsonpath(resp, v)
+
+    @classmethod
+    def handle_sql(cls, sql: str):
+        for sql in sql.split(";"):
+            sql = sql.strip()
+            if sql == '':
+                continue
+            # 查后置sql
+            result = db.execute_sql(sql)
 
     @classmethod
     async def equal(cls, expect_json: dict, resp: dict, info: dict) -> str:
@@ -230,16 +241,27 @@ class ApiAutoTest:
         # 解析 base_url
         base_url = test_suite.env.base_url
         base_header = test_suite.env.base_header
+        db_settings = test_suite.env.db_settings
+        mysql = Mysql()
+        await mysql.connect(db_settings.dict())
 
         # 得到case 列表
         for case in test_suite.cases:
             info = report.model(case, base_url, base_header)
             try:
-                method, content_type, path, body, extra, expect, header = await cls.handle_case(case, data_pool, base_header)
+                method, content_type, path, body, extra, expect, header, backend_sql = await cls.handle_case(case, data_pool, base_header)
                 # 请求接口
                 res = await cls.request(method, base_url + path, content_type, body, header, info)
                 # 提取参数
                 await cls.extra_var(extra, data_pool, res)
+                # 后置sql
+                for sql in backend_sql.split(";"):
+                    sql = sql.strip()
+                    if sql == '':
+                        continue
+                    result = await mysql.exec_sql(sql)
+                    if result is not None:
+                        data_pool.update(result)
                 # 断言
                 result = await cls.equal(expect, res, info)
                 if result == "正常":
@@ -256,5 +278,6 @@ class ApiAutoTest:
                 info.get("")
                 info["pool"] = data_pool
                 test_suite_info.append(info)
+        mysql.close()
         test_suite_data["suite_info"] = test_suite_info
         return test_suite_data
