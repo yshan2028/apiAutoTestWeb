@@ -1,7 +1,7 @@
 /*
  * @Author: zy7y
  * @Date: 2021-05-22 15:54:24
- * @LastEditTime: 2021-05-23 22:10:45
+ * @LastEditTime: 2021-05-24 21:29:33
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \frontend\src\api\env.js
@@ -45,7 +45,7 @@ export function updateEnv(data) {
       project_id: data.project_id,
       base_header: data.base_header,
       desc: data.desc,
-      db_setting: data.db_setting
+      db_settings: data.db_settings
     }
   });
 }
@@ -67,4 +67,18 @@ export function projectList() {
     url: "/projects",
     method: "get"
   });
+}
+
+/**
+ * @description: 测试数据库连接
+ * @param {*}
+ * @return {*}
+ */
+
+export function mysqlConnect(data) {
+  return request({
+    url: "/mysql",
+    method: 'post',
+    data
+  })
 }

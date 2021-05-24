@@ -53,8 +53,13 @@ class ExportInterface(BaseModel):
 
 
 class MysqlSettings(BaseModel):
+    # host: str = "127.0.0.1"
+    # port: int = 3306
+    # user: str = "root"
+    # password: str = "123456"
+    # db: str = "uniapp_shop"
     host: str
-    port: str
+    port: int
     user: str
     password: str
-    database: str
+    db: str

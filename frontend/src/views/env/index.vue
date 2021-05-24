@@ -139,10 +139,10 @@
         </el-form-item>
         <el-form-item label="数据库配置">
           <vue-json-editor
-            v-model="mysql_default"
-            :showBtns="true"
+            v-model="temp.db_settings"
+            :showBtns=" temp.db_settings !== null"
             :mode="'code'"
-            @json-change="onJsonChange"
+            @json-chage="onJsonChange"
             lang="zh" 
             @json-save="connectTest"
           />
@@ -176,6 +176,7 @@ import {
   projectList,
   updateEnv,
   deleteEnv,
+  mysqlConnect
 } from "@/api/env";
 import waves from "@/directive/waves"; // waves directive
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
@@ -186,12 +187,11 @@ import vueJsonEditor from "vue-json-editor";
  * 
  * 
  * {
-  "host": "http://localhost",
-  "port": "123456",
-  "charset":"utf8mb4",
+  "host": "localhost",
+  "port": 3306,
   "user":"root",
   "password":"123456",
-  "db_name":"uniapp_shop"
+  "db":"uniapp_shop"
 }
  */
 export default {
@@ -205,15 +205,6 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
-
-      mysql_default: {
-  "host": "http://localhost",
-  "port": "3306",
-  "charset":"utf8mb4",
-  "user":"root",
-  "password":"123456",
-  "database":"uniapp_shop"
-},
       // 默认查询所有接口参数
       listQuery: {
         page: 1,
@@ -323,6 +314,7 @@ export default {
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
+          console.log(this.temp)
           updateEnv(this.temp).then((res) => {
             this.dialogFormVisible = false;
             this.$notify({
@@ -349,11 +341,20 @@ export default {
     },
 
     onJsonChange(value) {
-      this.temp.base_header = value;
-    },
-    
-    connectTest(value){
       console.log(value)
+      this.temp.db_settings = value
+      console.log(this.temp)
+    },
+
+    connectTest(value){
+      // 调用连接数据库api
+      mysqlConnect(value).then((res)=> {
+        console.log(res)
+        this.$message({
+          type: 'success',
+          message: res.message
+        })
+      })
     }
   },
 };

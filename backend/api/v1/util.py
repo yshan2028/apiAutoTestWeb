@@ -17,6 +17,7 @@ from util import read_file
 from fastapi import APIRouter
 
 from util.wr_file import write_file
+from util.mysql import connect
 
 utils = APIRouter(tags=["其他"])
 
@@ -62,6 +63,12 @@ async def get_plant():
     })
 
 
-@utils.post("/mysql_connection", summary="mysql连接测试")
+@utils.post("/mysql", summary="mysql连接测试")
 async def test_connection(mysql: MysqlSettings):
-    pass
+    print(mysql)
+    coon = await connect(mysql.dict())
+    print(coon)
+    if isinstance(coon, str):
+        return core.Fail(message=coon)
+    coon.close()
+    return core.Success(message="连接成功.")
