@@ -165,13 +165,12 @@ class ApiAutoTest:
         extra = await cls.template_var(case.extra, data_pool)
         expect = await cls.template_var(case.expect, data_pool)
         header = await cls.template_var(base_header, data_pool)
-        backend_sql = await cls.template_var(case.backend_sql, data_pool)
 
         # graphql 规范组装 请求数据
         if case.interface.standard == 'graphql':
             body = {"operationName": await cls.get_operation_name(case.query), "query": case.query, "variables": body}
 
-        return method, content_type, path, body, extra, expect, header, backend_sql
+        return method, content_type, path, body, extra, expect, header, case.backend_sql
 
     @classmethod
     async def extra_var(cls, extra_json: dict, data_pool: dict, resp: dict):
@@ -187,15 +186,6 @@ class ApiAutoTest:
         """
         for k, v in extra_json.items():
             data_pool[k] = await cls.extra_jsonpath(resp, v)
-
-    @classmethod
-    def handle_sql(cls, sql: str):
-        for sql in sql.split(";"):
-            sql = sql.strip()
-            if sql == '':
-                continue
-            # 查后置sql
-            result = db.execute_sql(sql)
 
     @classmethod
     async def equal(cls, expect_json: dict, resp: dict, info: dict) -> str:
@@ -243,7 +233,7 @@ class ApiAutoTest:
         base_header = test_suite.env.base_header
         db_settings = test_suite.env.db_settings
         mysql = Mysql()
-        await mysql.connect(db_settings.dict())
+        await mysql.connect(db_settings)
 
         # 得到case 列表
         for case in test_suite.cases:
@@ -255,11 +245,18 @@ class ApiAutoTest:
                 # 提取参数
                 await cls.extra_var(extra, data_pool, res)
                 # 后置sql
+                backend_sql = Template(backend_sql).safe_substitute(data_pool)
+                for func in re.findall('\\${(.*?)}', backend_sql):
+                    try:
+                        backend_sql = backend_sql.replace('${%s}' % func, await cls.exec_func(func))
+                    except Exception as e:
+                        continue
                 for sql in backend_sql.split(";"):
                     sql = sql.strip()
                     if sql == '':
                         continue
                     result = await mysql.exec_sql(sql)
+                    print(sql, result)
                     if result is not None:
                         data_pool.update(result)
                 # 断言

@@ -12,6 +12,7 @@ from datetime import datetime
 from typing import Union
 
 import aiomysql
+from aiomysql import cursors
 
 
 async def connect(setting: dict):
@@ -36,7 +37,7 @@ class Mysql:
         self.coon = None
 
     async def connect(self, setting: dict):
-        self.conn = await aiomysql.connect(**setting)
+        self.conn = await aiomysql.connect(**setting, cursorclass=cursors.DictCursor)
 
     async def exec_sql(self, sql: str):
         async with self.conn.cursor() as cur:
@@ -57,4 +58,4 @@ class Mysql:
         return result
 
     def close(self):
-        self.coon.close()
+        self.conn.close()
