@@ -124,18 +124,18 @@
           <el-input v-model="temp.base_url" />
         </el-form-item>
         <el-form-item label="基准header" prop="base_header">
-          <!-- <vue-json-editor
+          <vue-json-editor
             v-model="temp.base_header"
             :showBtns="false"
             :mode="'code'"
-            @json-change="onJsonChange"
-          /> -->
-          <el-input
+            @json-change="headerChange"
+          />
+          <!-- <el-input
             v-model="temp.base_header"
             :autosize="{ minRows: 2, maxRows: 4 }"
             type="textarea"
             placeholder="Please input"
-          />
+          /> -->
         </el-form-item>
         <el-form-item label="数据库配置">
           <vue-json-editor
@@ -221,7 +221,7 @@ export default {
         name: "",
         base_url: "",
         desc: "",
-        base_header: '{}',
+        base_header: null,
         db_settings: null
       },
       dialogFormVisible: false,
@@ -268,7 +268,7 @@ export default {
         project_id: "",
         name: "",
         base_url: "",
-        base_header: '{}',
+        base_header: null,
         desc: "",
         db_settings: null
       };
@@ -338,6 +338,11 @@ export default {
         });
         this.getList();
       });
+    },
+
+    headerChange(value){
+      console.log(value)
+      this.base_header = value
     },
 
     onJsonChange(value) {

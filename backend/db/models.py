@@ -44,8 +44,8 @@ class Project(AbstractModel):
 class Env(AbstractModel):
     base_url = fields.CharField(255, description="基准地址", unique=True)
     desc = fields.TextField(description="描述信息", null=True)
-    base_header = fields.TextField(
-        description="基准请求头", null=True, default='{}')
+    base_header = fields.JSONField(
+        description="基准请求头", null=True, default=None)
     # allow_none 生成的pydantic模型可以不传递该参数, default 可以设置数据库表中的默认值，pydantic的默认值
     db_settings = fields.JSONField(null=True, default=None, description="数据库配置")
     # 外键关联project表，可通过.envs访问到项目所有表
@@ -77,6 +77,7 @@ class Interface(AbstractModel):
 
 class Case(AbstractModel):
     name = fields.CharField(max_length=255, description="用例名称", unique=True)
+    case_header = fields.TextField(description="用例请求头", null=True, default=None)
     content_type = fields.CharEnumField(
         ContentType,
         description="参数类型",
