@@ -15,7 +15,7 @@ import core
 
 from fastapi import APIRouter, BackgroundTasks
 from db import models
-from util import ApiAutoTest
+from apiAutoTest import Start
 
 from util import scheduler
 
@@ -25,11 +25,10 @@ tasks = APIRouter(tags=['任务相关'])
 async def run_case(t_id: int):
     task_obj = await models.Task_Pydantic.from_queryset_single(models.Task.get(id=t_id))
     start = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    data = await ApiAutoTest.test(task_obj)
+    data = await Start.run(task_obj)
     end = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     report_obj = await models.Report.create(name=task_obj.name, data=data, start=start, end=end, tasks_id=t_id)
-    # return models.Report_Pydantic.from_tortoise_orm(report_obj)
     return report_obj.id
 
 

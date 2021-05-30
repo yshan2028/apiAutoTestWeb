@@ -100,7 +100,7 @@ class Case(AbstractModel):
         allow_none=True,
         default=None)
     # 后置sql
-    backend_sql = fields.TextField(description="后置sql", default="", null=True, allow_none=True)
+    backend_sql = fields.JSONField(description="后置sql", default=[], null=True, allow_none=True)
     expect = fields.TextField(description="预期结果", default='{}')
     interface = fields.ForeignKeyField(
         'models.Interface',

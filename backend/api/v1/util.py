@@ -21,6 +21,8 @@ from util.mysql import connect
 
 utils = APIRouter(tags=["其他"])
 
+filepath = "apiAutoTest/hooks.py"
+
 
 @utils.get("/help", name="获取说明文档")
 async def help_doc():
@@ -29,7 +31,7 @@ async def help_doc():
 
 @utils.get("/code", name="获取扩展脚本")
 async def get_code():
-    return core.Success(data=await read_file('util/extend.py'))
+    return core.Success(data=await read_file(filepath))
 
 
 @utils.put("/code", name="修改扩展脚本")
@@ -37,7 +39,7 @@ async def update_code(script: core.Code):
     # 验证是否可以被执行
     try:
         exec(script.code)
-        await write_file('util/extend.py', script.code)
+        await write_file(filepath, script.code)
         return core.Success()
     except Exception as e:
         return core.Fail(message=f"更新失败.{e}")
@@ -65,9 +67,7 @@ async def get_plant():
 
 @utils.post("/mysql", summary="mysql连接测试")
 async def test_connection(mysql: MysqlSettings):
-    print(mysql)
     coon = await connect(mysql.dict())
-    print(coon)
     if isinstance(coon, str):
         return core.Fail(message=coon)
     coon.close()

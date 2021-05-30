@@ -1,12 +1,19 @@
 #!/usr/bin/env/ python3
 # -*- coding:utf-8 -*-
 """
-@Project: apiAutoTestFastapi
+@Project: backend
 @File  :report.py
 @Author:zy7y
-@Date  :2021/5/2 0:16
-@Desc  : 单个用例响应模型
+@Date  :2021/5/29 23:48
+@Desc  :
 """
+
+
+def http_info(req, res):
+    return {
+        "request": req,
+        "response": res
+    }
 
 
 def model(case: object, url: str, header: str):
@@ -38,7 +45,9 @@ def model(case: object, url: str, header: str):
             "time": None,
             "status": None
         },
+        "backend_sql": case.backend_sql,
         "extra": case.extra,
-        "expect": case.expect
+        "expect": case.expect,
+        "result": "异常",
+        "error_code": ""
     }
-
