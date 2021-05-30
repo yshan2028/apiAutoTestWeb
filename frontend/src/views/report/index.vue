@@ -22,7 +22,7 @@
 
             <el-table-column label="用例总数" min-width="80">
         <template slot-scope="{ row }">
-          <span>{{ row.data.suite_info.length }}</span>
+          <span>{{ row.data.expect + row.data.fail + row.data.pass }}</span>
         </template>
       </el-table-column>
                   <el-table-column label="测试开始时间" min-width="150px">

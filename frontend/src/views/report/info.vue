@@ -69,8 +69,6 @@
         </el-table-column>
         <el-table-column label="请求方法" prop="request.method">
         </el-table-column>
-        <el-table-column label="数据格式" prop="request.content_type">
-        </el-table-column>
         <el-table-column label="接口地址" prop="info.interface.path">
         </el-table-column>
         <el-table-column label="状态码" prop="response.status">
